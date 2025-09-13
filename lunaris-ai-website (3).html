@@ -1,0 +1,1263 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lunaris AI - Intelligence Artificielle Discord</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 25%, #2d3561 50%, #4a5568 100%);
+            color: white;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Background animations */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            overflow: hidden;
+        }
+
+        .floating-shapes {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+
+        .shape {
+            position: absolute;
+            border-radius: 50%;
+            background: linear-gradient(45deg, rgba(100, 181, 246, 0.1), rgba(144, 202, 249, 0.05));
+            animation: float 20s infinite linear;
+        }
+
+        .shape:nth-child(1) { width: 80px; height: 80px; top: 20%; left: 10%; animation-delay: 0s; }
+        .shape:nth-child(2) { width: 120px; height: 120px; top: 60%; left: 80%; animation-delay: -5s; }
+        .shape:nth-child(3) { width: 60px; height: 60px; top: 80%; left: 20%; animation-delay: -10s; }
+        .shape:nth-child(4) { width: 100px; height: 100px; top: 40%; left: 60%; animation-delay: -15s; }
+
+        @keyframes float {
+            0% { transform: translateY(0px) rotate(0deg); opacity: 0.7; }
+            50% { transform: translateY(-100px) rotate(180deg); opacity: 0.3; }
+            100% { transform: translateY(0px) rotate(360deg); opacity: 0.7; }
+        }
+
+        /* Stars background */
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .star {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 3s infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(10, 14, 39, 0.95);
+            backdrop-filter: blur(20px);
+            z-index: 1000;
+            padding: 1rem 0;
+            border-bottom: 1px solid rgba(100, 181, 246, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        nav.scrolled {
+            background: rgba(10, 14, 39, 0.98);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #64b5f6;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            margin-right: 12px;
+            background: linear-gradient(135deg, #64b5f6, #42a5f5);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            animation: logoGlow 3s ease-in-out infinite alternate;
+        }
+
+        .logo-icon::after {
+            content: '🌙';
+            font-size: 20px;
+            filter: drop-shadow(0 0 10px rgba(100, 181, 246, 0.8));
+        }
+
+        @keyframes logoGlow {
+            0% { box-shadow: 0 0 20px rgba(100, 181, 246, 0.5); }
+            100% { box-shadow: 0 0 40px rgba(100, 181, 246, 0.8), 0 0 60px rgba(100, 181, 246, 0.4); }
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            padding: 0.7rem 1.5rem;
+            border-radius: 25px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            font-weight: 500;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-links a::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .nav-links a:hover::before {
+            left: 100%;
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            background: rgba(100, 181, 246, 0.15);
+            color: #64b5f6;
+            transform: translateY(-2px);
+        }
+
+        /* Pages */
+        .page {
+            display: none;
+            min-height: 100vh;
+            padding-top: 80px;
+            animation: pageSlide 0.6s ease-out;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        @keyframes pageSlide {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* Page Accueil */
+        .hero {
+            text-align: center;
+            padding: 6rem 0;
+            position: relative;
+            min-height: 90vh;
+            display: flex;
+            align-items: center;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(100, 181, 246, 0.1);
+            border: 1px solid rgba(100, 181, 246, 0.3);
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            color: #64b5f6;
+            margin-bottom: 2rem;
+            animation: fadeInUp 1s ease-out;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: #4caf50;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        .hero h1 {
+            font-size: 5.5rem;
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, #64b5f6, #90caf9, #bbdefb, #e3f2fd);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: fadeInUp 1s ease-out 0.2s both;
+            line-height: 1.1;
+        }
+
+        .hero-subtitle {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            opacity: 0.9;
+            font-weight: 500;
+            animation: fadeInUp 1s ease-out 0.4s both;
+        }
+
+        .hero-description {
+            font-size: 1.2rem;
+            margin-bottom: 3rem;
+            opacity: 0.7;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            animation: fadeInUp 1s ease-out 0.6s both;
+            line-height: 1.6;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            animation: fadeInUp 1s ease-out 0.8s both;
+        }
+
+        .btn {
+            padding: 1.2rem 2.5rem;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.7rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.6s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #64b5f6, #42a5f5, #1e88e5);
+            color: white;
+            box-shadow: 0 8px 32px rgba(100, 181, 246, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(100, 181, 246, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 2px solid rgba(100, 181, 246, 0.4);
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(100, 181, 246, 0.2);
+            border-color: #64b5f6;
+            transform: translateY(-3px);
+        }
+
+        /* Hero Image */
+        .hero-image {
+            margin-top: 3rem;
+            position: relative;
+            animation: fadeInUp 1s ease-out 1s both;
+        }
+
+        .ai-visualization {
+            width: 400px;
+            height: 300px;
+            margin: 0 auto;
+            background: linear-gradient(135deg, rgba(100, 181, 246, 0.1), rgba(144, 202, 249, 0.05));
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(100, 181, 246, 0.2);
+        }
+
+        .ai-brain {
+            font-size: 8rem;
+            color: #64b5f6;
+            animation: brainPulse 3s ease-in-out infinite;
+            filter: drop-shadow(0 0 30px rgba(100, 181, 246, 0.5));
+        }
+
+        @keyframes brainPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        /* Features */
+        .features {
+            padding: 8rem 0;
+            position: relative;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 5rem;
+        }
+
+        .section-title {
+            font-size: 3.5rem;
+            font-weight: 700;
+            color: #64b5f6;
+            margin-bottom: 1.5rem;
+        }
+
+        .section-subtitle {
+            font-size: 1.3rem;
+            opacity: 0.8;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2.5rem;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 3rem 2.5rem;
+            border-radius: 20px;
+            text-align: center;
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #64b5f6, #42a5f5, #1e88e5);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .feature-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            border-color: rgba(100, 181, 246, 0.3);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 1.5rem;
+            background: linear-gradient(135deg, #64b5f6, #42a5f5);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            color: white;
+            position: relative;
+        }
+
+        .feature-icon::after {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, #64b5f6, transparent, #42a5f5);
+            border-radius: 22px;
+            z-index: -1;
+            animation: iconGlow 3s linear infinite;
+        }
+
+        @keyframes iconGlow {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .feature-card h3 {
+            font-size: 1.4rem;
+            margin-bottom: 1rem;
+            color: white;
+            font-weight: 600;
+        }
+
+        .feature-card p {
+            line-height: 1.7;
+            opacity: 0.8;
+            font-size: 1rem;
+        }
+
+        /* Terms page */
+        .terms-content {
+            padding: 4rem 0;
+            max-width: 900px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin-top: 2rem;
+            padding: 3rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .terms-content h1 {
+            color: #64b5f6;
+            margin-bottom: 3rem;
+            text-align: center;
+            font-size: 3rem;
+            font-weight: 700;
+        }
+
+        .terms-content h2 {
+            color: #90caf9;
+            margin: 3rem 0 1.5rem 0;
+            font-size: 1.5rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .terms-content h2::before {
+            content: '▶';
+            color: #64b5f6;
+        }
+
+        .terms-content p, .terms-content li {
+            line-height: 1.8;
+            margin-bottom: 1.2rem;
+            font-size: 1.05rem;
+        }
+
+        .terms-content ul {
+            padding-left: 2rem;
+        }
+
+        .terms-content li {
+            margin-bottom: 0.8rem;
+        }
+
+        .terms-content strong {
+            color: #64b5f6;
+        }
+
+        .terms-content a {
+            color: #64b5f6;
+            text-decoration: none;
+            border-bottom: 1px solid transparent;
+            transition: border-color 0.3s;
+        }
+
+        .terms-content a:hover {
+            border-bottom-color: #64b5f6;
+        }
+
+        /* Support page */
+        .support-content {
+            padding: 2rem 0;
+        }
+
+        .support-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .support-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 2.5rem;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .support-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .support-card h3 {
+            color: #64b5f6;
+            margin-bottom: 1.5rem;
+            font-size: 1.4rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .discord-section {
+            background: rgba(88, 101, 242, 0.1);
+            border-radius: 20px;
+            padding: 3rem;
+            margin: 3rem 0;
+            border: 1px solid rgba(88, 101, 242, 0.3);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .discord-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(88, 101, 242, 0.1), transparent);
+            animation: discordShine 3s infinite;
+        }
+
+        @keyframes discordShine {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .discord-section h3 {
+            color: #64b5f6;
+            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
+        }
+
+        /* Footer */
+        footer {
+            background: rgba(10, 14, 39, 0.9);
+            text-align: center;
+            padding: 3rem 0;
+            margin-top: 6rem;
+            border-top: 1px solid rgba(100, 181, 246, 0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            flex-wrap: wrap;
+            gap: 2rem;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: #64b5f6;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+        }
+
+        /* Mobile responsiveness */
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 3.5rem; }
+            .section-title { font-size: 2.5rem; }
+            .nav-links { gap: 1rem; }
+            .cta-buttons { flex-direction: column; align-items: center; }
+            .features-grid { grid-template-columns: 1fr; }
+            .support-grid { grid-template-columns: 1fr; }
+            .ai-visualization { width: 300px; height: 250px; }
+            .ai-brain { font-size: 6rem; }
+        }
+
+        @media (max-width: 480px) {
+            .container { padding: 0 1rem; }
+            .hero { padding: 4rem 0; }
+            .features { padding: 4rem 0; }
+            .terms-content, .support-card { padding: 2rem; }
+        }
+
+        /* Scroll animations */
+        .animate-on-scroll {
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .animate-on-scroll.animated {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <!-- Background animations -->
+    <div class="bg-animation">
+        <div class="floating-shapes">
+            <div class="shape"></div>
+            <div class="shape"></div>
+            <div class="shape"></div>
+            <div class="shape"></div>
+        </div>
+    </div>
+
+    <!-- Stars -->
+    <div class="stars" id="stars"></div>
+
+    <!-- Navigation -->
+    <nav id="navbar">
+        <div class="nav-container">
+            <a href="#" class="logo" onclick="showPage('home')">
+                <div class="logo-icon"></div>
+                Lunaris AI
+            </a>
+            <ul class="nav-links">
+                <li><a href="#" onclick="showPage('home')" class="active"><i class="fas fa-home"></i> Accueil</a></li>
+                <li><a href="#" onclick="showPage('features')"><i class="fas fa-star"></i> Fonctionnalités</a></li>
+                <li><a href="#" onclick="showPage('terms')"><i class="fas fa-file-contract"></i> Conditions</a></li>
+                <li><a href="#" onclick="showPage('support')"><i class="fas fa-headset"></i> Support</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Page Accueil -->
+    <div id="home" class="page active">
+        <section class="hero">
+            <div class="container">
+                <div class="hero-content">
+                    <div class="hero-badge">
+                        <div class="status-dot"></div>
+                        <i class="fas fa-robot"></i>
+                        Bot en ligne et opérationnel
+                    </div>
+                    
+                    <h1>Lunaris AI</h1>
+                    <div class="hero-subtitle">Intelligence Artificielle Avancée</div>
+                    <p class="hero-description">
+                        Découvrez la puissance de l'IA sur Discord avec des réponses intelligentes, 
+                        des interactions ludiques et un support informatif pour votre communauté.
+                    </p>
+                    
+                    <div class="cta-buttons">
+                        <a href="https://discord.gg/d5vJ6AvH6G" class="btn btn-primary" target="_blank">
+                            <i class="fab fa-discord"></i>
+                            Ajouter le bot via le serveur
+                        </a>
+                        <a href="https://discord.gg/d5vJ6AvH6G" class="btn btn-secondary" target="_blank">
+                            <i class="fas fa-comments"></i>
+                            Serveur Support
+                        </a>
+                    </div>
+
+                    <div class="hero-image">
+                        <div class="ai-visualization">
+                            <div class="ai-brain">🧠</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="features animate-on-scroll">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title">Fonctionnalités Avancées</h2>
+                    <p class="section-subtitle">
+                        Découvrez tout ce que Lunaris AI peut apporter à votre serveur Discord
+                    </p>
+                </div>
+                
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-brain"></i>
+                        </div>
+                        <h3>Intelligence Avancée</h3>
+                        <p>Réponses contextuelles et conversations naturelles grâce à une IA de pointe qui comprend le contexte et s'adapte à votre communauté.</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-gamepad"></i>
+                        </div>
+                        <h3>Interactions Ludiques</h3>
+                        <p>Communauté actif , support compétant</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-graduation-cap"></i>
+                        </div>
+                        <h3>Support Informatif</h3>
+                        <p>Base de connaissances étendue et assistance intelligente sur une variété de sujets pour éduquer et informer.</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <h3>Données Sécurisées</h3>
+                        <p>Protection maximale de vos données personnelles avec chiffrement avancé et respect total de votre vie privée.</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-bolt"></i>
+                        </div>
+                        <h3>Réponses Ultra-Rapides</h3>
+                        <p>Temps de réponse optimisé et infrastructure haute performance pour une expérience fluide et réactive.</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-rocket"></i>
+                        </div>
+                        <h3>Développement Continu</h3>
+                        <p>Mises à jour régulières, nouvelles fonctionnalités et améliorations constantes basées sur les retours utilisateurs.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="container">
+            <div class="discord-section animate-on-scroll">
+                <h3><i class="fas fa-user-cog"></i> Développé par Lyven</h3>
+                <p>Lunaris AI est créé avec passion par <strong>@lyven.pro</strong></p>
+                <p>Un projet innovant pour révolutionner l'expérience Discord de votre communauté</p>
+                <div style="margin-top: 2rem;">
+                    <a href="https://discord.gg/d5vJ6AvH6G" class="btn btn-primary" target="_blank">
+                        <i class="fab fa-discord"></i>
+                        Rejoindre la communauté
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Page Fonctionnalités -->
+    <div id="features" class="page">
+        <div class="container" style="padding-top: 2rem;">
+            <div class="section-header">
+                <h1 class="section-title">Fonctionnalités Complètes</h1>
+                <p class="section-subtitle">
+                    Explorez en détail toutes les capacités de Lunaris AI
+                </p>
+            </div>
+            
+            <div style="display: grid; gap: 3rem; max-width: 1000px; margin: 3rem auto 0;">
+                <div class="feature-card animate-on-scroll" style="text-align: left;">
+                    <div style="display: flex; align-items: flex-start; gap: 1.5rem;">
+                        <div class="feature-icon" style="margin: 0; flex-shrink: 0;">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                        <div>
+                            <h3 style="color: #64b5f6; margin-bottom: 1rem; font-size: 1.5rem;">Intelligence Artificielle Conversationnelle</h3>
+                            <p style="font-size: 1.1rem; line-height: 1.7;">
+                                Lunaris AI utilise des modèles d'IA de dernière génération pour comprendre le contexte, 
+                                maintenir des conversations cohérentes et fournir des réponses pertinentes à vos questions. 
+                                L'IA s'adapte au ton de votre serveur et apprend de chaque interaction.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="feature-card animate-on-scroll" style="text-align: left;">
+                    <div style="display: flex; align-items: flex-start; gap: 1.5rem;">
+                        <div class="feature-icon" style="margin: 0; flex-shrink: 0;">
+                            <i class="fas fa-memory"></i>
+                        </div>
+                        <div>
+                            <h3 style="color: #64b5f6; margin-bottom: 1rem; font-size: 1.5rem;">Mémoire Contextuelle Avancée</h3>
+                            <p style="font-size: 1.1rem; line-height: 1.7;">
+                                Le bot maintient une mémoire locale par utilisateur, permettant des conversations 
+                                continues et personnalisées. Il se souvient de vos préférences et du contexte 
+                                de vos discussions précédentes pour une expérience plus naturelle.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="feature-card animate-on-scroll" style="text-align: left;">
+                    <div style="display: flex; align-items: flex-start; gap: 1.5rem;">
+                        <div class="feature-icon" style="margin: 0; flex-shrink: 0;">
+                            <i class="fas fa-sliders-h"></i>
+                        </div>
+                        <div>
+                            <h3 style="color: #64b5f6; margin-bottom: 1rem; font-size: 1.5rem;">Commandes Slash Intuitives</h3>
+                            <p style="font-size: 1.1rem; line-height: 1.7;">
+                                Interface utilisateur moderne avec des commandes slash faciles à utiliser. 
+                                Auto-complétion intelligente, descriptions détaillées et paramètres optionnels 
+                                pour une expérience utilisateur optimale.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="feature-card animate-on-scroll" style="text-align: left;">
+                    <div style="display: flex; align-items: flex-start; gap: 1.5rem;">
+                        <div class="feature-icon" style="margin: 0; flex-shrink: 0;">
+                            <i class="fas fa-user-shield"></i>
+                        </div>
+                        <div>
+                            <h3 style="color: #64b5f6; margin-bottom: 1rem; font-size: 1.5rem;">Protection des Données Premium</h3>
+                            <p style="font-size: 1.1rem; line-height: 1.7;">
+                                Chiffrement end-to-end de toutes les données, conformité RGPD complète, 
+                                et politique de confidentialité stricte. Aucune donnée n'est jamais partagée 
+                                avec des tiers et vous gardez le contrôle total sur vos informations.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="feature-card animate-on-scroll" style="text-align: left;">
+                    <div style="display: flex; align-items: flex-start; gap: 1.5rem;">
+                        <div class="feature-icon" style="margin: 0; flex-shrink: 0;">
+                            <i class="fas fa-tachometer-alt"></i>
+                        </div>
+                        <div>
+                            <h3 style="color: #64b5f6; margin-bottom: 1rem; font-size: 1.5rem;">Performance Ultra-Optimisée</h3>
+                            <p style="font-size: 1.1rem; line-height: 1.7;">
+                                Infrastructure cloud haute performance avec CDN mondial, temps de réponse 
+                                inférieurs à 100ms, et disponibilité maximale. Monitoring 24/7 et auto-scaling 
+                                pour gérer les pics de trafic sans interruption.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="feature-card animate-on-scroll" style="text-align: left;">
+                    <div style="display: flex; align-items: flex-start; gap: 1.5rem;">
+                        <div class="feature-icon" style="margin: 0; flex-shrink: 0;">
+                            <i class="fas fa-puzzle-piece"></i>
+                        </div>
+                        <div>
+                            <h3 style="color: #64b5f6; margin-bottom: 1rem; font-size: 1.5rem;">Intégrations Avancées</h3>
+                            <p style="font-size: 1.1rem; line-height: 1.7;">
+                                Compatible avec les principaux bots Discord, API webhook, intégrations tierces, 
+                                et systèmes de modération. Lunaris AI s'intègre parfaitement dans votre 
+                                écosystème Discord existant.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Page Conditions -->
+    <div id="terms" class="page">
+        <div class="terms-content animate-on-scroll">
+            <h1><i class="fas fa-file-contract"></i> Conditions d'Utilisation</h1>
+            
+            <h2><i class="fas fa-info-circle"></i> Présentation du service</h2>
+            <p>Lunaris AI est une intelligence artificielle de pointe conçue pour enrichir votre expérience Discord. 
+            Développé par <strong>Lyven</strong> (@lyven.pro), notre bot offre des réponses intelligentes, 
+            des interactions ludiques et un support informatif complet pour dynamiser votre communauté.</p>
+
+            <h2><i class="fas fa-handshake"></i> Acceptation des conditions</h2>
+            <p>En utilisant Lunaris AI, vous vous engagez à respecter les conditions suivantes :</p>
+            <ul>
+                <li><strong>Respect des règles :</strong> Conformité totale aux conditions de service Discord et aux règles spécifiques de votre serveur</li>
+                <li><strong>Usage légitime :</strong> Utilisation du bot uniquement à des fins légales, éthiques et constructives</li>
+                <li><strong>Responsabilité :</strong> Reconnaissance que le créateur ne peut être tenu responsable des actions des utilisateurs</li>
+                <li><strong>Communauté saine :</strong> Engagement à maintenir un environnement respectueux et bienveillant</li>
+            </ul>
+
+            <h2><i class="fas fa-database"></i> Collecte et utilisation des données</h2>
+            <p>Lunaris AI collecte et traite les données suivantes de manière sécurisée :</p>
+            <ul>
+                <li><strong>Conversations :</strong> Messages et interactions pour améliorer la pertinence des réponses (mémoire locale par utilisateur)</li>
+                <li><strong>Métadonnées :</strong> Informations techniques nécessaires au fonctionnement optimal du bot</li>
+                <li><strong>Préférences :</strong> Paramètres personnalisés pour une expérience utilisateur adaptée</li>
+            </ul>
+            <p><strong>Garantie de confidentialité :</strong> Toutes les données sont strictement utilisées pour le fonctionnement du bot 
+            et ne sont <em>jamais</em> partagées avec des tiers. Nous respectons votre vie privée et appliquons les standards 
+            de sécurité les plus élevés.</p>
+
+            <h2><i class="fas fa-exclamation-triangle"></i> Limitation de responsabilité</h2>
+            <ul>
+                <li><strong>Service "tel quel" :</strong> Lunaris AI est fourni dans l'état actuel de développement</li>
+                <li><strong>Disponibilité :</strong> Nous visons une disponibilité maximale mais ne garantissons pas un service ininterrompu</li>
+                <li><strong>Erreurs :</strong> Le bot peut occasionnellement présenter des dysfonctionnements en cours de correction</li>
+                <li><strong>Dommages :</strong> Aucune responsabilité ne peut être engagée pour les dommages indirects ou pertes de données</li>
+            </ul>
+
+            <h2><i class="fas fa-sync-alt"></i> Modification des conditions</h2>
+            <p>Ces conditions peuvent être modifiées à tout moment pour s'adapter aux évolutions du service. 
+            Les utilisateurs seront notifiés des changements importants et sont invités à consulter régulièrement 
+            cette page. La poursuite de l'utilisation après modification vaut acceptation des nouvelles conditions.</p>
+
+            <h2><i class="fas fa-envelope"></i> Contact et support</h2>
+            <p>Pour toute question, suggestion ou problème concernant Lunaris AI :</p>
+            <ul>
+                <li><strong>Discord :</strong> <a href="#">@lyven.pro</a> - Contact direct avec le développeur</li>
+                <li><strong>Serveur officiel :</strong> <a href="https://discord.gg/YOUR_INVITE">Rejoindre notre communauté</a></li>
+                <li><strong>Support technique :</strong> Assistance 24/7 via notre serveur dédié</li>
+                <li><strong>Feedback :</strong> Vos retours sont précieux pour améliorer le service</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Page Support -->
+    <div id="support" class="page">
+        <div class="container support-content">
+            <div class="section-header">
+                <h1 class="section-title"><i class="fas fa-headset"></i> Support & Assistance</h1>
+                <p class="section-subtitle">
+                    Notre équipe est là pour vous accompagner dans votre expérience Lunaris AI
+                </p>
+            </div>
+            
+            <div class="discord-section animate-on-scroll">
+                <h3><i class="fab fa-discord"></i> Serveur Support Officiel</h3>
+                <p style="font-size: 1.1rem; margin-bottom: 1.5rem;">
+                    Rejoignez notre communauté active pour obtenir de l'aide instantanée, 
+                    partager vos expériences et découvrir les dernières nouveautés.
+                </p>
+                <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; margin: 2rem 0;">
+                    <a href="https://discord.gg/YOUR_INVITE" class="btn btn-primary" target="_blank">
+                        <i class="fab fa-discord"></i>
+                        Rejoindre le serveur
+                    </a>
+                    <a href="#" class="btn btn-secondary">
+                        <i class="fas fa-book"></i>
+                        Documentation
+                    </a>
+                </div>
+            </div>
+
+            <div class="support-grid">
+                <div class="support-card animate-on-scroll">
+                    <h3><i class="fas fa-phone-alt"></i> Moyens de contact</h3>
+                    <div style="space-y: 1rem;">
+                        <p><i class="fab fa-discord" style="color: #5865F2; margin-right: 0.5rem;"></i>
+                        <strong>Discord :</strong> @lyven.pro</p>
+                        <p><i class="fas fa-server" style="color: #64b5f6; margin-right: 0.5rem;"></i>
+                        <strong>Serveur :</strong> <a href="https://discord.gg/d5vJ6AvH6G" style="color: #64b5f6;">discord.gg/lunaris</a></p>
+                        <p><i class="fas fa-envelope" style="color: #64b5f6; margin-right: 0.5rem;"></i>
+                        <strong>Email :</strong> support@lunaris-ai.com</p>
+                        <p><i class="fas fa-clock" style="color: #4caf50; margin-right: 0.5rem;"></i>
+                        <strong>Support :</strong> 24/7 disponible</p>
+                    </div>
+                </div>
+
+                <div class="support-card animate-on-scroll">
+                    <h3><i class="fas fa-question-circle"></i> Questions Fréquentes</h3>
+                    
+                    <div style="margin-bottom: 1.5rem;">
+                        <p><strong><i class="fas fa-plus-circle" style="color: #64b5f6;"></i> Comment ajouter Lunaris AI ?</strong></p>
+                        <p style="margin-left: 1.5rem; opacity: 0.9;">Cliquez sur "Ajouter au serveur" et suivez les instructions. Permissions administrateur recommandées.</p>
+                    </div>
+                    
+                    <div style="margin-bottom: 1.5rem;">
+                        <p><strong><i class="fas fa-dollar-sign" style="color: #4caf50;"></i> Le bot est-il gratuit ?</strong></p>
+                        <p style="margin-left: 1.5rem; opacity: 0.9;">Oui, Lunaris AI est 100% gratuit avec toutes les fonctionnalités incluses.</p>
+                    </div>
+                    
+                    <div style="margin-bottom: 1.5rem;">
+                        <p><strong><i class="fas fa-shield-alt" style="color: #64b5f6;"></i> Sécurité des données ?</strong></p>
+                        <p style="margin-left: 1.5rem; opacity: 0.9;">Chiffrement complet, conformité RGPD, zéro partage avec des tiers.</p>
+                    </div>
+                </div>
+
+                <div class="support-card animate-on-scroll">
+                    <h3><i class="fas fa-bug"></i> Signaler un Bug</h3>
+                    <p>Rencontré un problème ? Aidez-nous à améliorer Lunaris AI :</p>
+                    <ul style="margin: 1rem 0; padding-left: 1.5rem;">
+                        <li>📱 Contactez @lyven.pro directement</li>
+                        <li>🎫 Créez un ticket sur le serveur support</li>
+                        <li>📝 Décrivez le problème en détail</li>
+                        <li>📸 Joignez des captures d'écran si possible</li>
+                    </ul>
+                    <div style="background: rgba(244, 67, 54, 0.1); padding: 1rem; border-radius: 10px; border-left: 3px solid #f44336;">
+                        <p><strong>🚨 Bugs critiques :</strong> Réponse garantie sous 24h</p>
+                    </div>
+                </div>
+
+                <div class="support-card animate-on-scroll">
+                    <h3><i class="fas fa-lightbulb"></i> Suggestions & Feedback</h3>
+                    <p>Vos idées façonnent l'avenir de Lunaris AI !</p>
+                    <div style="display: grid; gap: 1rem; margin: 1.5rem 0;">
+                        <div style="background: rgba(76, 175, 80, 0.1); padding: 1rem; border-radius: 10px;">
+                            <p><strong>💡 Nouvelles fonctionnalités</strong></p>
+                            <p style="opacity: 0.9; font-size: 0.95rem;">Proposez vos idées sur le serveur support</p>
+                        </div>
+                        <div style="background: rgba(33, 150, 243, 0.1); padding: 1rem; border-radius: 10px;">
+                            <p><strong>🎨 Améliorations UI/UX</strong></p>
+                            <p style="opacity: 0.9; font-size: 0.95rem;">Partagez vos retours d'expérience</p>
+                        </div>
+                        <div style="background: rgba(156, 39, 176, 0.1); padding: 1rem; border-radius: 10px;">
+                            <p><strong>🚀 Demandes spéciales</strong></p>
+                            <p style="opacity: 0.9; font-size: 0.95rem;">Besoins spécifiques pour votre serveur</p>
+                        </div>
+                    </div>
+                </div>
+
+                
+                    
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <div class="logo-icon" style="width: 30px; height: 30px;"></div>
+                <div>
+                    <p style="margin: 0; font-weight: 600;">&copy; 2024 Lunaris AI</p>
+                    <p style="margin: 0; opacity: 0.7; font-size: 0.9rem;">Développé avec ❤️ par Lyven</p>
+                </div>
+            </div>
+            <ul class="footer-links">
+                <li><a href="#" onclick="showPage('terms')"><i class="fas fa-file-contract"></i> Conditions</a></li>
+                <li><a href="#" onclick="showPage('support')"><i class="fas fa-shield-alt"></i> Confidentialité</a></li>
+                <li><a href="https://github.com/lyvendev" target="_blank"><i class="fab fa-discord"></i> Discord</a></li>
+                <li><a href="#"><i class="fab fa-github"></i> GitHub</a></li>
+            </ul>
+        </div>
+    </footer>
+
+    <script>
+        // Générer les étoiles
+        function createStars() {
+            const starsContainer = document.getElementById('stars');
+            const numberOfStars = 100;
+            
+            for (let i = 0; i < numberOfStars; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.animationDelay = Math.random() * 3 + 's';
+                starsContainer.appendChild(star);
+            }
+        }
+
+        // Navigation
+        function showPage(pageId) {
+            // Cacher toutes les pages
+            const pages = document.querySelectorAll('.page');
+            pages.forEach(page => page.classList.remove('active'));
+            
+            // Retirer la classe active des liens nav
+            const navLinks = document.querySelectorAll('.nav-links a');
+            navLinks.forEach(link => link.classList.remove('active'));
+            
+            // Afficher la page sélectionnée
+            document.getElementById(pageId).classList.add('active');
+            
+            // Ajouter la classe active au lien cliqué
+            event.target.classList.add('active');
+            
+            // Scroller vers le haut
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            
+            // Réactiver les animations
+            setTimeout(() => {
+                initScrollAnimations();
+            }, 100);
+        }
+
+        // Animations au scroll
+        function initScrollAnimations() {
+            const animatedElements = document.querySelectorAll('.animate-on-scroll');
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('animated');
+                    }
+                });
+            }, {
+                threshold: 0.1,
+                rootMargin: '0px 0px -100px 0px'
+            });
+            
+            animatedElements.forEach(el => {
+                observer.observe(el);
+            });
+        }
+
+        // Navbar scroll effect
+        window.addEventListener('scroll', () => {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // Hover effects pour les liens de ressources
+        document.addEventListener('DOMContentLoaded', () => {
+            const resourceLinks = document.querySelectorAll('.support-card a[href="#"]');
+            resourceLinks.forEach(link => {
+                link.addEventListener('mouseenter', () => {
+                    link.style.background = 'rgba(100, 181, 246, 0.1)';
+                });
+                link.addEventListener('mouseleave', () => {
+                    link.style.background = 'transparent';
+                });
+            });
+        });
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', () => {
+            createStars();
+            initScrollAnimations();
+            
+            // Animation d'entrée pour la page d'accueil
+            setTimeout(() => {
+                const heroElements = document.querySelectorAll('.hero-content > *');
+                heroElements.forEach((el, index) => {
+                    el.style.animationDelay = (index * 0.2) + 's';
+                });
+            }, 100);
+        });
+
+        // Smooth scroll pour tous les liens internes
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Easter egg pour les développeurs
+        console.log(`
+        🌙 Lunaris AI - Développé par Lyven
+        
+        ╭─────────────────────────────╮
+        │  Merci d'utiliser Lunaris AI  │
+        │  Rejoignez notre Discord !     │
+        ╰─────────────────────────────╯
+        
+        🚀 Propulsé par l'IA de pointe
+        💖 Fait avec amour pour Discord
+        `);
+    </script>
+</body>
+</html>
